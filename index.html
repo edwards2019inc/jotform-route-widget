@@ -34,8 +34,7 @@
             //inside callback function , it is the best practice while developing widgets
             JFCustomWidget.subscribe("ready", function(formid, value){
 				logStatusMessage("ready: " + JSON.stringify(formid) + ", " + JSON.stringify(value));
-				document.getElementById('statusText').innerHTML = 'onReady!';
-                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
+				var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerHTML = label;
                 //subscribe to form submit event
                 JFCustomWidget.subscribe("submit", function(){
