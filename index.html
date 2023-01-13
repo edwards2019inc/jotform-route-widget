@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+        <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+		<style> 
+			#div.status_msg{
+				background:#CCCCCC;
+			}
+		</style>
     </head>
     <body>
         <div id="main">
+			<div id="statusBar"></div>
             <h3>This is my first widget.</h3>
-            <span id="labelText"></span>
+			<span id="labelText"></span>
             <input type="text" id="userInput">
+            <input type="submit" onclick="onSubmit();"></input>
         </div>
         <script type="text/javascript">
+			function logStatusMessage(msg){
+				var statusDiv = $("<div class='status_msg'></div>");
+				$(statusDiv).text(msg);
+				$("#statusBar").append(statusDiv);
+				setTimeout(function(){
+					$(statusDiv).remove();
+				}
+				, 3000);
+			};
+			function onSubmit(){
+				logStatusMessage("submitted");
+			}
             //always subscribe to ready event and implement widget related code
             //inside callback function , it is the best practice while developing widgets
             JFCustomWidget.subscribe("ready", function(){
+				logStatusMessage("ready");
+				document.getElementById('statusText').innerHTML = 'onReady!';
                 var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerHTML = label;
                 //subscribe to form submit event
@@ -26,6 +48,9 @@
                     // send value to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 });
+				JFCustomWidget.subscribe('populate', function(data){
+					logStatusMessage("populate: " + JSON.stringify(data));
+				});
             });
         </script>
     </body>
