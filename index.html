@@ -3,6 +3,29 @@
     <head>
         <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+		<script>
+			const cipher = salt => {
+			const textToChars = text => text.split('').map(c => c.charCodeAt(0));
+			const byteHex = n => ("0" + Number(n).toString(16)).substr(-2);
+			const applySaltToChar = code => textToChars(salt).reduce((a,b) => a ^ b, code);
+
+			return text => text.split('')
+				.map(textToChars)
+				.map(applySaltToChar)
+				.map(byteHex)
+				.join('');
+		}
+
+		const decipher = salt => {
+			const textToChars = text => text.split('').map(c => c.charCodeAt(0));
+			const applySaltToChar = code => textToChars(salt).reduce((a,b) => a ^ b, code);
+			return encoded => encoded.match(/.{1,2}/g)
+				.map(hex => parseInt(hex, 16))
+				.map(applySaltToChar)
+				.map(charCode => String.fromCharCode(charCode))
+				.join('');
+		}
+		</script>
 		<style> 
 			#div.status_msg{
 				background:#CCCCCC;
@@ -12,10 +35,20 @@
     <body>
         <div id="main">
 			<div id="statusBar"></div>
-            <h3>This is my first widget.</h3>
-			<span id="labelText"></span>
-            <input type="text" id="userInput">
-            <input type="submit" onclick="onSubmit();"></input>
+            <h3>Ride Logistics.</h3>
+			<span id="label_text"></span><br>
+			<span id="salt_label">Secret Salt</span>
+			<input type="text" id="salt"></input><br>
+			<span id="pickup_address_label">Pickup Address</span>
+            <input type="text" id="pickup_address" value="1310 Sherburne Ave St Paul MN 55104"><br>
+			<span id="destination_address_label">Destination Address</span>
+			<input type="text" id="destination_address" value="MSP Airport Terminal 1"><br>
+            <input type="submit" value="Calculate Route" onclick="onSubmit();"></input>
+			<h3>Route Info.</h3>
+			<div>
+				<span>Distance (mi):</span><span id="drive_distance"></span><span>mi</span><br>
+				<span>Drive time (min): </span><span id="drive_duration"></span><span>mi</span><br>
+			</div>
         </div>
         <script type="text/javascript">
 			function logStatusMessage(msg){
@@ -27,15 +60,48 @@
 				}
 				, 3000);
 			};
+			function km2mi(km){
+				return km * 3.28084 / 5280;
+			}
+			//function getDirections(apikey, origin, destination, timeAnchor, anchorTime){
+			function getDirections(apikey, origin, destination){
+				// timAnchor is one of departure_time or arrival_time
+				// anchorTime is an integer from Date.getTime()
+
+				//let url = "https://maps.googleapis.com/maps/api/directions/json?destination="+encodeURIComponent(destination)+"&origin="+encodeURIComponent(origin)+"&"+timeAnchor+"="+anchorTime+"&key="+apikey;
+				let url = "https://maps.googleapis.com/maps/api/directions/json?destination="+encodeURIComponent(destination)+"&origin="+encodeURIComponent(origin)+"&key="+apikey;
+				var xhttp = new XMLHttpRequest();
+				xhttp.setRequestHeader("Content-Type", "application/json");
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						// Typical action to be performed when the document is ready:
+						onDirectionsReady(JSON.parse(xhttp.responseText));
+					}
+				};
+				xhttp.open("GET", url, true);
+				xhttp.send();
+			}
 			function onSubmit(){
-				logStatusMessage("submitted");
+				let decoder = decipher($("#salt").text());
+				let key = decoder("5b53607b49635e5d73552e77687462564c726b227c456a2850767f7c6355505e697c22792e5869");
+				console.log("submitted");
+				let origin = $('#pickup_address').text();
+				let destination = $('#destination_address').text();
+				//let result = getDirections(apikey,origin,destination,"arrival_time",anchorTime);
+				getDirections(key,origin,destination);
+			}
+			function onDirectionsReady(directions){
+				let duration = directions.routes[0].legs[0].duration.value;
+				let distance = km2mi(directions.routes[0].legs[0].distance.value);
+				$('#drive_distance').text(distance);
+				$('#drive_duration').text(duration);
 			}
             //always subscribe to ready event and implement widget related code
             //inside callback function , it is the best practice while developing widgets
             JFCustomWidget.subscribe("ready", function(formid, value){
-				logStatusMessage("ready: " + JSON.stringify(formid) + ", " + JSON.stringify(value));
+				console.log("ready: " + JSON.stringify(formid) + ", " + JSON.stringify(value));
 				var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
-                document.getElementById('labelText').innerHTML = label;
+                document.getElementById('label_text').innerHTML = label;
                 //subscribe to form submit event
                 JFCustomWidget.subscribe("submit", function(){
                     var msg = {
@@ -48,7 +114,8 @@
                     JFCustomWidget.sendSubmit(msg);
                 });
 				JFCustomWidget.subscribe('populate', function(data){
-					logStatusMessage("populate: " + JSON.stringify(data));
+					//logStatusMessage("populate: " + JSON.stringify(data));
+					console.log("populate: " + JSON.stringify(data));
 				});
             });
         </script>
