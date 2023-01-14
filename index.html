@@ -113,7 +113,7 @@
 					driveTime:$('#drive_duration').text(),
 					driveDistance:$('#drive_distance').text()
 				}
-				JFCustomWidget.sendData({valid:true,value:jotformReturnData});
+				JFCustomWidget.sendData({valid:true,value:JSON.stringify(jotformReturnData)});
 			}
             //always subscribe to ready event and implement widget related code
             //inside callback function , it is the best practice while developing widgets
