@@ -51,6 +51,20 @@
 			</div>
         </div>
         <script type="text/javascript">
+			function initMaps(){
+				//let decoder = decipher($("#salt").val());
+				let decoder = decipher("iamsosohre");
+				let key = decoder("5b53607b49635e5d73552e77687462564c726b227c456a2850767f7c6355505e697c22792e5869");
+				let scriptEle = document.createElement("script");
+				scriptEle.setAttribute("type","text/javascript");
+				scriptEle.setAttribute("src","https://maps.googleapis.com/maps/api/js?callback=onMapsInit&key="+key+"&v=weekly");
+				$('body').append(scriptEle);
+				
+			}
+			function onMapsInit(){
+				directionsService = new google.maps.DirectionsService();
+				console.log("maps service ready");
+			}
 			function logStatusMessage(msg){
 				var statusDiv = $("<div class='status_msg'></div>");
 				$(statusDiv).text(msg);
@@ -64,32 +78,30 @@
 				return km * 3.28084 / 5280;
 			}
 			//function getDirections(apikey, origin, destination, timeAnchor, anchorTime){
-			function getDirections(apikey, origin, destination){
+			function getDirections(origin, destination){
 				// timAnchor is one of departure_time or arrival_time
 				// anchorTime is an integer from Date.getTime()
-
-				//let url = "https://maps.googleapis.com/maps/api/directions/json?destination="+encodeURIComponent(destination)+"&origin="+encodeURIComponent(origin)+"&"+timeAnchor+"="+anchorTime+"&key="+apikey;
-				let url = "https://maps.googleapis.com/maps/api/directions/json?destination="+encodeURIComponent(destination)+"&origin="+encodeURIComponent(origin)+"&key="+apikey;
-				var xhttp = new XMLHttpRequest();
-				xhttp.onreadystatechange = function() {
-					if (this.readyState == 4 && this.status == 200) {
-						// Typical action to be performed when the document is ready:
-						onDirectionsReady(JSON.parse(xhttp.responseText));
-					}
-				};
-				xhttp.open("GET", url, true);
-				xhttp.setRequestHeader('Access-Control-Allow-Origin', 'https://edwards2019inc.github.io');
-				xhttp.setRequestHeader("Content-Type", "application/json");
-				xhttp.send();
+				directionsService.route({
+				origin: {
+					query: origin,
+				},
+				destination: {
+					query: destination,
+				},
+					travelMode: google.maps.TravelMode.DRIVING,
+				})
+				.then((response) => {
+					onDirectionsReady(response);
+				})
+				.catch((e) => window.alert("Directions request failed due to " + status));
 			}
 			function onSubmit(){
-				let decoder = decipher($("#salt").val());
-				let key = decoder("5b53607b49635e5d73552e77687462564c726b227c456a2850767f7c6355505e697c22792e5869");
 				console.log("submitted");
 				let origin = $('#pickup_address').val();
 				let destination = $('#destination_address').val();
 				//let result = getDirections(apikey,origin,destination,"arrival_time",anchorTime);
-				getDirections(key,origin,destination);
+				getDirections(origin,destination);
+				
 			}
 			function onDirectionsReady(directions){
 				let duration = directions.routes[0].legs[0].duration.value;
@@ -119,6 +131,9 @@
 					console.log("populate: " + JSON.stringify(data));
 				});
             });
+			$(document).ready(function(){
+				initMaps();
+			});
         </script>
     </body>
 </html>
