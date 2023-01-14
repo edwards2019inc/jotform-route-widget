@@ -41,7 +41,7 @@
             <input type="text" id="pickup_address" value="Where do you want to be picked up?"><br>
 			<span id="destination_address_label">Destination Address</span>
 			<input type="text" id="destination_address" value="Where would you like to be dropped off?"><br>
-            <input type="submit" value="Calculate Route" onclick="onSubmit();"></input>
+            <input type="submit" id="calc_ride" value="Calculate Route" onclick="onSubmit();"></input>
 			<h3>Route Info.</h3>
 			<div>
 				<span>Distance:</span><span id="drive_distance"></span><span>&nbsp;mi</span><br>
@@ -49,6 +49,7 @@
 			</div>
         </div>
         <script type="text/javascript">
+			jotformReturnData = {};
 			function initMaps(){
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
@@ -106,6 +107,13 @@
 				let distance = km2mi(directions.routes[0].legs[0].distance.value);
 				$('#drive_distance').text(distance);
 				$('#drive_duration').text(duration/60.0);
+				jotformReturnData = {
+					pickupAddress: $('#pickup_address').val(),
+					destinationAddress: $('#destination_address').val(),
+					driveTime:$('#drive_duration').text(),
+					driveDistance:$('#drive_distance').text()
+				}
+				JFCustomWidget.sendData({valid:true,value:JSON.stringify(jotformReturnData)};
 			}
             //always subscribe to ready event and implement widget related code
             //inside callback function , it is the best practice while developing widgets
@@ -113,23 +121,24 @@
 				console.log("ready: " + JSON.stringify(formid) + ", " + JSON.stringify(value));
 				var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('label_text').innerHTML = label;
+				$("#calc_ride").val("Calculate Route");
                 //subscribe to form submit event
                 JFCustomWidget.subscribe("submit", function(){
                     var msg = {
                         //you should valid attribute to data for JotForm
                         //to be able to use youw widget as required
                         valid: true,
-                        pickup_address: document.getElementById('pickup_address').value,
-						destination_address: document.getElementById('pickup_address').value,
-						duration_min:$('#drive_duration').text(),
-						drive_distance:$('#drive_distance').text()
-                    }
+						value:JSON.stringify(jotformReturnData)
+                    };
                     // send value to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 });
 				JFCustomWidget.subscribe('populate', function(data){
 					//logStatusMessage("populate: " + JSON.stringify(data));
 					console.log("populate: " + JSON.stringify(data));
+					let ride_data = JSON.parse(data.value);
+					$('#pickup_address').val(ride_data.pickup);
+					$('#destination_address').val(ride_data.destination);
 				});
             });
 			$(document).ready(function(){
