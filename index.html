@@ -37,17 +37,15 @@
 			<div id="statusBar"></div>
             <h3>Ride Logistics.</h3>
 			<span id="label_text"></span><br>
-			<span id="salt_label">Secret Salt</span>
-			<input type="text" id="salt"></input><br>
 			<span id="pickup_address_label">Pickup Address</span>
-            <input type="text" id="pickup_address" value="1310 Sherburne Ave St Paul MN 55104"><br>
+            <input type="text" id="pickup_address" value="Where do you want to be picked up?"><br>
 			<span id="destination_address_label">Destination Address</span>
-			<input type="text" id="destination_address" value="MSP Airport Terminal 1"><br>
+			<input type="text" id="destination_address" value="Where would you like to be dropped off?"><br>
             <input type="submit" value="Calculate Route" onclick="onSubmit();"></input>
 			<h3>Route Info.</h3>
 			<div>
-				<span>Distance (mi):</span><span id="drive_distance"></span><span>mi</span><br>
-				<span>Drive time (min): </span><span id="drive_duration"></span><span>mi</span><br>
+				<span>Distance:</span><span id="drive_distance"></span><span>&nbsp;mi</span><br>
+				<span>Drive time: </span><span id="drive_duration"></span><span>&nbsp;min</span><br>
 			</div>
         </div>
         <script type="text/javascript">
@@ -107,7 +105,7 @@
 				let duration = directions.routes[0].legs[0].duration.value;
 				let distance = km2mi(directions.routes[0].legs[0].distance.value);
 				$('#drive_distance').text(distance);
-				$('#drive_duration').text(duration);
+				$('#drive_duration').text(duration/60.0);
 			}
             //always subscribe to ready event and implement widget related code
             //inside callback function , it is the best practice while developing widgets
@@ -121,7 +119,10 @@
                         //you should valid attribute to data for JotForm
                         //to be able to use youw widget as required
                         valid: true,
-                        value: document.getElementById('userInput').value
+                        pickup_address: document.getElementById('pickup_address').value,
+						destination_address: document.getElementById('pickup_address').value,
+						duration_min:$('#drive_duration').text(),
+						drive_distance:$('#drive_distance').text()
                     }
                     // send value to JotForm
                     JFCustomWidget.sendSubmit(msg);
