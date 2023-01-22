@@ -50,6 +50,7 @@
         </div>
         <script type="text/javascript">
 			jotformReturnData = {};
+			rideData = {}
 			function initMaps(){
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
@@ -136,9 +137,11 @@
 				JFCustomWidget.subscribe('populate', function(data){
 					//logStatusMessage("populate: " + JSON.stringify(data));
 					console.log("populate: " + JSON.stringify(data));
-					let ride_data = JSON.parse(data.value);
-					$('#pickup_address').val(ride_data.pickup);
-					$('#destination_address').val(ride_data.destination);
+					rideData = JSON.parse(data.value);
+					$('#pickup_address').val(rideData.pickup);
+					$('#destination_address').val(rideData.destination);
+					$("#calc_ride").val("Calculate Route");
+					onSubmit();
 				});
             });
 			$(document).ready(function(){
