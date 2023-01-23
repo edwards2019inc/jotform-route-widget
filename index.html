@@ -106,7 +106,7 @@
 			function onDirectionsReady(directions){
 				let duration = directions.routes[0].legs[0].duration.value;
 				let distance = km2mi(directions.routes[0].legs[0].distance.value);
-				duration = Math.round(Math.ceil(duration / 300 ) * 300);
+				duration = Math.round(Math.ceil(duration / 300 ) * 300)/60;
 				distance = Math.round(distance * 10)/10;
 				$('#drive_distance').text(distance);
 				$('#drive_duration').text(duration);
