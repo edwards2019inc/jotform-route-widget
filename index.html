@@ -3,6 +3,7 @@
     <head>
         <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+		<script src="jquery.geocomplete.js"></script>
 		<script>
 			const cipher = salt => {
 			const textToChars = text => text.split('').map(c => c.charCodeAt(0));
@@ -27,22 +28,33 @@
 		}
 		</script>
 		<style> 
-			#div.status_msg{
+			div.status_msg{
 				background:#CCCCCC;
+			}
+			div.input_header{
+				margin-bottom:5px;
+				margin-top:10px;
+				font-size:18px;
+			}
+			input{
+				margin:5px;
+			}
+			input[type=text]{
+				width:100%;
 			}
 		</style>
     </head>
     <body>
         <div id="main">
 			<div id="statusBar"></div>
-            <h3>Ride Logistics.</h3>
+            <h3>Ride Logistics:</h3>
 			<span id="label_text"></span><br>
-			<span id="pickup_address_label">Pickup Address</span>
+			<div class="input_header"><span  id="pickup_address_label">Pickup Address</span></div>
             <input type="text" id="pickup_address" value="Where do you want to be picked up?"><br>
-			<span id="destination_address_label">Destination Address</span>
+			<div class="input_header"><span id="destination_address_label">Destination Address</span></div>
 			<input type="text" id="destination_address" value="Where would you like to be dropped off?"><br>
             <input type="submit" id="calc_ride" value="Calculate Route" onclick="onSubmit();"></input>
-			<h3>Route Info.</h3>
+			<h3>Route Details:</h3>
 			<div>
 				<span>Distance:</span><span id="drive_distance"></span><span>&nbsp;mi</span><br>
 				<span>Drive time: </span><span id="drive_duration"></span><span>&nbsp;min</span><br>
@@ -50,20 +62,21 @@
         </div>
         <script type="text/javascript">
 			jotformReturnData = {};
-			rideData = {}
 			function initMaps(){
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
 				let key = decoder("5b53607b49635e5d73552e77687462564c726b227c456a2850767f7c6355505e697c22792e5869");
 				let scriptEle = document.createElement("script");
 				scriptEle.setAttribute("type","text/javascript");
-				scriptEle.setAttribute("src","https://maps.googleapis.com/maps/api/js?callback=onMapsInit&key="+key+"&v=weekly");
+				scriptEle.setAttribute("src","https://maps.googleapis.com/maps/api/js?callback=onMapsInit&key="+key+"&v=weekly&libraries=places&sensor=False");
 				$('body').append(scriptEle);
 				
 			}
 			function onMapsInit(){
 				directionsService = new google.maps.DirectionsService();
 				console.log("maps service ready");
+				$("#pickup_address").geocomplete();
+				$("#destination_address").geocomplete();
 			}
 			function logStatusMessage(msg){
 				var statusDiv = $("<div class='status_msg'></div>");
@@ -106,10 +119,8 @@
 			function onDirectionsReady(directions){
 				let duration = directions.routes[0].legs[0].duration.value;
 				let distance = km2mi(directions.routes[0].legs[0].distance.value);
-				duration = Math.round(Math.ceil(duration / 300 ) * 300)/60;
-				distance = Math.round(distance * 10)/10;
-				$('#drive_distance').text(distance);
-				$('#drive_duration').text(duration);
+				$('#drive_distance').text(Math.ceil(distance*10)/10);
+				$('#drive_duration').text(Math.ceil(duration/60 * 10)/10);
 				jotformReturnData = {
 					pickupAddress: $('#pickup_address').val(),
 					destinationAddress: $('#destination_address').val(),
@@ -139,11 +150,9 @@
 				JFCustomWidget.subscribe('populate', function(data){
 					//logStatusMessage("populate: " + JSON.stringify(data));
 					console.log("populate: " + JSON.stringify(data));
-					rideData = JSON.parse(data.value);
-					$('#pickup_address').val(rideData.pickup);
-					$('#destination_address').val(rideData.destination);
-					$("#calc_ride").val("Calculate Route");
-					onSubmit();
+					let ride_data = JSON.parse(data.value);
+					$('#pickup_address').val(ride_data.pickup);
+					$('#destination_address').val(ride_data.destination);
 				});
             });
 			$(document).ready(function(){
