@@ -153,6 +153,8 @@
 					let ride_data = JSON.parse(data.value);
 					$('#pickup_address').val(ride_data.pickup);
 					$('#destination_address').val(ride_data.destination);
+					$("#calc_ride").val("Calculate Route");
+					onSubmit();
 				});
             });
 			$(document).ready(function(){
