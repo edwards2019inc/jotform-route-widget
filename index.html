@@ -138,6 +138,7 @@
 				$("#calc_ride").val("Calculate Route");
                 //subscribe to form submit event
                 JFCustomWidget.subscribe("submit", function(){
+					console.log("Routing Widget submit");
                     var msg = {
                         //you should valid attribute to data for JotForm
                         //to be able to use youw widget as required
@@ -155,7 +156,9 @@
 								"Trip destination: " + jotformReturnData.destinationAddress,
 								"One-way distance: "+jotformReturnData.driveDistance+ " mi",
 								"One-way duration: "+jotformReturnData.driveTime + " mins"].join("\n")
-					}
+					};
+					console.log("Submitting data: ");
+					console.log(msg);
                     // send value to JotForm
                     JFCustomWidget.sendSubmit(msg);
 					
