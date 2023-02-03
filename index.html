@@ -146,11 +146,19 @@
                     };
 					msg = {
 						valid:true,
-						value:"Trip pick-up location: "+jotformReturnData.pickupAddress + " Trip destination: " + jotformReturnData.destinationAddress + " One-way distance: "+jotformReturnData.driveDistance+ " mi One-way duration: "+jotformReturnData.driveTime + " mins"
+						//return [a + ": " + t.origin_addresses[0], 
+						//r + ": " + t.destination_addresses[0],
+						//l + ": " + t.rows[0].elements[0].distance.text,
+						//d + ": " + t.rows[0].elements[0].duration.text]
+						//.join("\n")
+						value:["Trip pick-up location: "+jotformReturnData.pickupAddress,
+								"Trip destination: " + jotformReturnData.destinationAddress,
+								"One-way distance: "+jotformReturnData.driveDistance+ " mi",
+								"One-way duration: "+jotformReturnData.driveTime + " mins"].join("\n");
 					}
                     // send value to JotForm
                     JFCustomWidget.sendSubmit(msg);
-					return [a + ": " + t.origin_addresses[0], r + ": " + t.destination_addresses[0], l + ": " + t.rows[0].elements[0].distance.text, d + ": " + t.rows[0].elements[0].duration.text].join("\n")
+					
                 });
 				JFCustomWidget.subscribe('populate', function(data){
 					//logStatusMessage("populate: " + JSON.stringify(data));
