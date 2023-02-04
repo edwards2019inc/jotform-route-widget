@@ -113,6 +113,7 @@
 				let origin = $('#pickup_address').val();
 				let destination = $('#destination_address').val();
 				//let result = getDirections(apikey,origin,destination,"arrival_time",anchorTime);
+				
 				getDirections(origin,destination);
 				
 			}
@@ -167,10 +168,17 @@
 					//logStatusMessage("populate: " + JSON.stringify(data));
 					console.log("populate: " + JSON.stringify(data));
 					let ride_data = JSON.parse(data.value);
-					$('#pickup_address').val(ride_data.pickup);
-					$('#destination_address').val(ride_data.destination);
-					$("#calc_ride").val("Calculate Route");
-					onSubmit();
+					let cur_pickup = $('#pickup_address').val();
+					let cur_dest = $('#destination_address').val();
+					if(cur_pickup != ride_data.pickup || cur_dest != ride_data.destination){
+						console.log("Updating ride data");
+						$('#pickup_address').val(ride_data.pickup);
+						$('#destination_address').val(ride_data.destination);
+						$("#calc_ride").val("Calculate Route");
+						onSubmit();
+					}else{
+						console.log("populate event called but has same pickup & destination, so not refreshing");
+					}
 				});
             });
 			$(document).ready(function(){
