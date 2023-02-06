@@ -36,12 +36,21 @@
 				margin-top:10px;
 				font-size:18px;
 			}
+			div.button{
+				padding:10px;
+				border:2px solid black;
+				cursor:pointer;
+				max-width:150px;
+				text-align:center;
+				
+			}
 			input{
 				margin:5px;
 			}
 			input[type=text]{
 				width:100%;
 			}
+			
 		</style>
     </head>
     <body>
@@ -53,7 +62,9 @@
             <input type="text" id="pickup_address" value="Where do you want to be picked up?"><br>
 			<div class="input_header"><span id="destination_address_label">Destination Address</span></div>
 			<input type="text" id="destination_address" value="Where would you like to be dropped off?"><br>
-            <input type="submit" id="calc_ride" value="Calculate Route" onclick="onSubmit();"></input>
+            <div class="button" id="calc_ride" onclick="onSubmit();">
+				<span style="font-weight:bold;font-size:18px;">Calculate Route</span>
+			</div>
 			<h3>Route Details:</h3>
 			<div>
 				<span>Distance:</span><span id="drive_distance"></span><span>&nbsp;mi</span><br>
