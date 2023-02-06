@@ -147,7 +147,6 @@
 				console.log("ready: " + JSON.stringify(formid) + ", " + JSON.stringify(value));
 				var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('label_text').innerHTML = label;
-				$("#calc_ride").val("Calculate Route");
                 //subscribe to form submit event
                 JFCustomWidget.subscribe("submit", function(){
 					console.log("Routing Widget submit");
@@ -185,7 +184,6 @@
 						console.log("Updating ride data");
 						$('#pickup_address').val(ride_data.pickup);
 						$('#destination_address').val(ride_data.destination);
-						$("#calc_ride").val("Calculate Route");
 						onSubmit();
 					}else{
 						console.log("populate event called but has same pickup & destination, so not refreshing");
