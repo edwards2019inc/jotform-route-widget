@@ -73,6 +73,45 @@
         </div>
         <script type="text/javascript">
 			jotformReturnData = {};
+			let pickupComponents = {};
+			let destinationComponents = {};
+
+			function extractAddressComponents(result) {
+				let components = {
+					unit: "",
+					street_number: "",
+					street_name: "",
+					city: "",
+					state: "",
+					zip: ""
+				};
+				
+				if (!result || !result.address_components) return components;
+
+				result.address_components.forEach(component => {
+					const types = component.types;
+					if (types.includes("subpremise")) {
+						components.unit = component.long_name;
+					}
+					if (types.includes("street_number")) {
+						components.street_number = component.long_name;
+					}
+					if (types.includes("route")) {
+						components.street_name = component.long_name;
+					}
+					if (types.includes("locality")) {
+						components.city = component.long_name;
+					}
+					if (types.includes("administrative_area_level_1")) {
+						components.state = component.short_name;
+					}
+					if (types.includes("postal_code")) {
+						components.zip = component.long_name;
+					}
+				});
+				return components;
+			}
+
 			function initMaps(){
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
@@ -86,8 +125,16 @@
 			function onMapsInit(){
 				directionsService = new google.maps.DirectionsService();
 				console.log("maps service ready");
-				$("#pickup_address").geocomplete();
-				$("#destination_address").geocomplete();
+				$("#pickup_address").geocomplete()
+				.bind("geocode:result", function(event, result){
+					console.log("Pickup Result: ", result);
+					pickupComponents = extractAddressComponents(result);
+				});
+				$("#destination_address").geocomplete()
+				.bind("geocode:result", function(event, result){
+					console.log("Destination Result: ", result);
+					destinationComponents = extractAddressComponents(result);
+				});
 			}
 			function logStatusMessage(msg){
 				var statusDiv = $("<div class='status_msg'></div>");
@@ -137,8 +184,11 @@
 					pickupAddress: $('#pickup_address').val(),
 					destinationAddress: $('#destination_address').val(),
 					driveTime:$('#drive_duration').text(),
-					driveDistance:$('#drive_distance').text()
+					driveDistance:$('#drive_distance').text(),
+					pickupAddressComponents: pickupComponents,
+					destinationAddressComponents: destinationComponents
 				}
+				// console.log("return data: ", jotformReturnData);
 				JFCustomWidget.sendData({valid:true,value:JSON.stringify(jotformReturnData)});
 			}
             //always subscribe to ready event and implement widget related code
