@@ -73,8 +73,8 @@
         </div>
         <script type="text/javascript">
 			jotformReturnData = {};
-			let pickupComponents = {};
-			let destinationComponents = {};
+			pickupComponents = {};
+			destinationComponents = {};
 
 			function extractAddressComponents(result) {
 				let components = {
@@ -118,6 +118,7 @@
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
 				let key = decoder("5b53607b49635e5d73552e77687462564c726b227c456a2850767f7c6355505e697c22792e5869");
+				key = "AIzaSyAFFbDZJkAGxKQ_mR9tVxBymqpC0KUWzBg";
 				let scriptEle = document.createElement("script");
 				scriptEle.setAttribute("type","text/javascript");
 				scriptEle.setAttribute("src","https://maps.googleapis.com/maps/api/js?callback=onMapsInit&key="+key+"&v=weekly&libraries=places&sensor=False");
