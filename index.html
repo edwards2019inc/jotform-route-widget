@@ -111,7 +111,9 @@
 				});
 				return components;
 			}
-
+			function getNormalizedAddress(components) {
+				return components.street_number + components.street_name + (components.unit? " #"+components.unit : "") + ", " + components.city + ", " + components.state + " " + components.zip;
+			}
 			function initMaps(){
 				//let decoder = decipher($("#salt").val());
 				let decoder = decipher("iamsosohre");
@@ -183,6 +185,8 @@
 				jotformReturnData = {
 					pickupAddress: $('#pickup_address').val(),
 					destinationAddress: $('#destination_address').val(),
+					pickupAddressKey: getNormalizedAddress(pickupComponents),
+					destinationAddressKey: getNormalizedAddress(destinationComponents),
 					driveTime:$('#drive_duration').text(),
 					driveDistance:$('#drive_distance').text(),
 					pickupAddressComponents: pickupComponents,
